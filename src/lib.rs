@@ -13,7 +13,7 @@ pub enum Instruction<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::examples::Average;
+    use crate::examples::{Average, Pi};
 
     #[test]
     fn test_average() {
@@ -29,6 +29,23 @@ mod tests {
                     Instruction::PrintFloat(_) => {}
                     Instruction::Input(_, f) => assert_eq!(None, f(&mut avg, input.next().unwrap())),
                     Instruction::Update(f) => f(&mut avg)
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_pi() {
+        let mut pi = Pi::new();
+        loop {
+            match pi.next() {
+                None => break,
+                Some(instr) => match instr {
+                    Instruction::PrintStr(_) => {}
+                    Instruction::PrintInt(_) => {}
+                    Instruction::PrintFloat(answer) => assert_eq!(answer, 3.1611986129870506),
+                    Instruction::Input(_, tolerance) => assert_eq!(None, tolerance(&mut pi, "0.01")),
+                    Instruction::Update(f) => f(&mut pi)
                 }
             }
         }
