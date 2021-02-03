@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 
-mod examples;
+pub mod examples;
 
 pub enum Instruction<T> {
     PrintStr(&'static str),
