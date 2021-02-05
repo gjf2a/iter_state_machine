@@ -1,4 +1,5 @@
 use crate::Instruction;
+use ieee754::Ieee754;
 
 #[derive(Copy,Clone,Debug)]
 pub struct Average {
