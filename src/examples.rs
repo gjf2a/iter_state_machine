@@ -1,4 +1,4 @@
-use crate::Instruction;
+use crate::{Instruction, StateMachine};
 use ieee754::Ieee754;
 
 #[derive(Copy,Clone,Debug)]
@@ -12,10 +12,12 @@ pub struct Average {
 
 impl Average {
     pub fn new() -> Self {
-        Average { total: 0, count: 0, done: false, input: None, reported: false}
+        Average { total: 0, count: 0, done: false, input: None, reported: false }
     }
+}
 
-    pub fn receive_input(&mut self, value: &str) -> Option<&'static str> {
+impl StateMachine for Average {
+    fn receive_input(&mut self, value: &str) -> Option<&'static str> {
         match value.parse::<isize>() {
             Ok(value) => {
                 if value < 0 {
@@ -32,7 +34,7 @@ impl Average {
         }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         self.total += self.input.unwrap();
         self.count += 1;
         self.input = None;
@@ -40,7 +42,7 @@ impl Average {
 }
 
 impl Iterator for Average {
-    type Item = Instruction<Average>;
+    type Item = Instruction;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.reported {
@@ -50,9 +52,9 @@ impl Iterator for Average {
                 self.reported = true;
                 Instruction::PrintInt(self.total / self.count)
             } else if self.input.is_some() {
-                Instruction::Update(Average::update)
+                Instruction::Update
             } else {
-                Instruction::Input("Enter a number (-1 to quit):", Average::receive_input)
+                Instruction::Input("Enter a number (-1 to quit):")
             }
             )
         }
@@ -70,43 +72,45 @@ pub struct Pi {
 
 impl Pi {
     pub fn new() -> Self {
-        Pi {sum: 1.0, denominator: -3, prev_sum: 0.0, tolerance: None, finished: false}
+        Pi { sum: 1.0, denominator: -3, prev_sum: 0.0, tolerance: None, finished: false }
     }
 
     pub fn value(&self) -> f64 {
         self.sum * 4.0
     }
+}
 
-    pub fn update(&mut self) {
-        self.prev_sum = self.sum;
-        self.sum += 1.0 / (self.denominator as f64);
-        self.denominator += 2 * self.denominator.signum();
-        self.denominator *= -1;
-    }
-
-    pub fn receive_input(&mut self, value: &str) -> Option<&'static str> {
+impl StateMachine for Pi {
+    fn receive_input(&mut self, value: &str) -> Option<&'static str> {
         match value.parse::<f64>() {
             Ok(tolerance) => {self.tolerance = Some(tolerance); None},
             Err(_) => Some("Not a float")
         }
     }
+
+    fn update(&mut self) {
+        self.prev_sum = self.sum;
+        self.sum += 1.0 / (self.denominator as f64);
+        self.denominator += 2 * self.denominator.signum();
+        self.denominator *= -1;
+    }
 }
 
 impl Iterator for Pi {
-    type Item = Instruction<Pi>;
+    type Item = Instruction;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.finished {
             None
         } else {
             match self.tolerance {
-                None => Some(Instruction::Input("Enter tolerance:", Pi::receive_input)),
+                None => Some(Instruction::Input("Enter tolerance:")),
                 Some(tolerance) => {
                     if (self.sum - self.prev_sum).abs() < tolerance {
                         self.finished = true;
                         Some(Instruction::PrintFloat(self.value()))
                     } else {
-                        Some(Instruction::Update(Pi::update))
+                        Some(Instruction::Update)
                     }
                 }
             }

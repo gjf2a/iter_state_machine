@@ -2,12 +2,18 @@
 
 pub mod examples;
 
-pub enum Instruction<T> {
+pub trait StateMachine {
+    fn receive_input(&mut self, value: &str) -> Option<&'static str>;
+    fn update(&mut self);
+}
+
+#[derive(Copy,Clone)]
+pub enum Instruction {
     PrintStr(&'static str),
     PrintInt(isize),
     PrintFloat(f64),
-    Input(&'static str, fn(&mut T, &str) -> Option<&'static str>),
-    Update(fn(&mut T))
+    Input(&'static str),
+    Update
 }
 
 #[cfg(test)]
@@ -27,8 +33,8 @@ mod tests {
                     Instruction::PrintStr(_) => {}
                     Instruction::PrintInt(n) => assert_eq!(n, 10),
                     Instruction::PrintFloat(_) => {}
-                    Instruction::Input(_, f) => assert_eq!(None, f(&mut avg, input.next().unwrap())),
-                    Instruction::Update(f) => f(&mut avg)
+                    Instruction::Input(_) => assert_eq!(None, avg.receive_input(input.next().unwrap())),
+                    Instruction::Update => avg.update()
                 }
             }
         }
@@ -44,8 +50,8 @@ mod tests {
                     Instruction::PrintStr(_) => {}
                     Instruction::PrintInt(_) => {}
                     Instruction::PrintFloat(answer) => assert_eq!(answer, 3.1611986129870506),
-                    Instruction::Input(_, tolerance) => assert_eq!(None, tolerance(&mut pi, "0.01")),
-                    Instruction::Update(f) => f(&mut pi)
+                    Instruction::Input(_) => assert_eq!(None, pi.receive_input("0.01")),
+                    Instruction::Update => pi.update()
                 }
             }
         }
