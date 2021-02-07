@@ -39,12 +39,8 @@ impl StateMachine for Average {
         self.count += 1;
         self.input = None;
     }
-}
 
-impl Iterator for Average {
-    type Item = Instruction;
-
-    fn next(&mut self) -> Option<Self::Item> {
+    fn next_instruction(&mut self) -> Option<Instruction> {
         if self.reported {
             None
         } else {
@@ -94,12 +90,8 @@ impl StateMachine for Pi {
         self.denominator += 2 * self.denominator.signum();
         self.denominator *= -1;
     }
-}
 
-impl Iterator for Pi {
-    type Item = Instruction;
-
-    fn next(&mut self) -> Option<Self::Item> {
+    fn next_instruction(&mut self) -> Option<Instruction> {
         if self.finished {
             None
         } else {

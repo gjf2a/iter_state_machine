@@ -5,6 +5,7 @@ pub mod examples;
 pub trait StateMachine {
     fn receive_input(&mut self, value: &str) -> Option<&'static str>;
     fn update(&mut self);
+    fn next_instruction(&mut self) -> Option<Instruction>;
 }
 
 #[derive(Copy,Clone)]
@@ -27,7 +28,7 @@ mod tests {
         let inputs = vec!["5", "15", "-1"];
         let mut input = inputs.iter();
         loop {
-            match avg.next() {
+            match avg.next_instruction() {
                 None => break,
                 Some(instr) => match instr {
                     Instruction::PrintStr(_) => {}
@@ -44,7 +45,7 @@ mod tests {
     fn test_pi() {
         let mut pi = Pi::new();
         loop {
-            match pi.next() {
+            match pi.next_instruction() {
                 None => break,
                 Some(instr) => match instr {
                     Instruction::PrintStr(_) => {}
