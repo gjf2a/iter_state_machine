@@ -86,7 +86,7 @@ impl StateMachine for Pi {
 
     fn update(&mut self) {
         self.prev_sum = self.sum;
-        self.sum += 1.0 / self.denominator as f64;
+        self.sum += 1.0 / self.denominator;
         self.denominator += 2.0 * self.denominator.signum();
         self.denominator *= -1.0;
     }
