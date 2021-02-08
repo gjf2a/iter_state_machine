@@ -60,7 +60,7 @@ impl StateMachine for Average {
 #[derive(Copy,Clone,Debug)]
 pub struct Pi {
     sum: f64,
-    denominator: i64,
+    denominator: f64,
     prev_sum: f64,
     tolerance: Option<f64>,
     finished: bool
@@ -68,7 +68,7 @@ pub struct Pi {
 
 impl Pi {
     pub fn new() -> Self {
-        Pi { sum: 1.0, denominator: -3, prev_sum: 0.0, tolerance: None, finished: false }
+        Pi { sum: 1.0, denominator: -3.0, prev_sum: 0.0, tolerance: None, finished: false }
     }
 
     pub fn value(&self) -> f64 {
@@ -86,9 +86,9 @@ impl StateMachine for Pi {
 
     fn update(&mut self) {
         self.prev_sum = self.sum;
-        self.sum += 1.0 / (self.denominator as f64);
-        self.denominator += 2 * self.denominator.signum();
-        self.denominator *= -1;
+        self.sum += 1.0 / self.denominator as f64;
+        self.denominator += 2.0 * self.denominator.signum();
+        self.denominator *= -1.0;
     }
 
     fn next_instruction(&mut self) -> Option<Instruction> {
