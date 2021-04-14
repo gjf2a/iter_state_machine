@@ -21,7 +21,11 @@ impl StateMachine for Average {
         match value.parse::<isize>() {
             Ok(value) => {
                 if value < 0 {
-                    self.done = true;
+                    if self.count > 0 {
+                        self.done = true;
+                    } else {
+                        return Some("Enter at least one value");
+                    }
                 } else {
                     self.input = Some(value);
                 }
